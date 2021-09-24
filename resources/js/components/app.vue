@@ -1,12 +1,13 @@
 <template>
     <div class="container-fluid px-0">
         <template v-if="submited">
-            <summary-point v-if="submited"></summary-point>
+            <summary-point :point="datasUser.point"></summary-point>
         </template>
         <template v-else>
         <div class="title-question-form col-12 card mb-4">
              <div class="card-body container">
-                <h1 class="header-question display-5 text-center">แบบประเมินความเสี่ยงด้วยตัวเอง <br>(ระยะเวลา 3 เดือนที่ผ่านมา)</h1>
+                <h2 class="header-question display-5 text-center">แบบประเมินความเสี่ยงด้วยตัวเอง <br>(ระยะเวลา 3 เดือนที่ผ่านมา)</h2>
+                <!-- <img src="../../img/Mplus-Logo.jpg" /> -->
              </div>
         </div>   
         <div class="container">    
@@ -14,17 +15,17 @@
                 <div class="col-12">
                     <div class="card my-4">
                         <div class="card-header">
-                             <h2 class="header-question text-center"><font-awesome-icon icon="address-card" /> ข้อมูลทั่วไป</h2>
+                             <h4 class="header-question text-center"><font-awesome-icon icon="address-card" /> ข้อมูลทั่วไป</h4>
                         </div>
                         <div class="card-body">
                             <form class="d-flex justify-content-center flex-wrap">
                                 <div class="form-group mx-auto col-12 col-sm-12 col-m-6 col-l-6 col-xl-6">
-                                    <label for="name">ชื่อ</label>
-                                    <input type="text" class="form-control border-none shadow" id="name" placeholder="กรอกชื่อของท่าน" autocomplete="off">
+                                    <label for="name">ชื่อ (หรือนามแฝง)</label>
+                                    <input type="text" class="form-control border-none shadow" id="name" v-model="informationUser.name" placeholder="กรอกชื่อของท่าน" autocomplete="off">
                                 </div>
                                 <div class="form-group mx-auto col-12 col-s-12 col-m-6 col-l-6 col-xl-6">
                                     <label for="tel">เบอร์โทรศัพท์</label>
-                                    <input type="tel" class="form-control  border-none shadow" id="tel" placeholder="กรอกเบอร์โทรศัพท์ของท่าน" autocomplete="off">
+                                    <input type="tel" class="form-control  border-none shadow" id="tel" v-model="informationUser.tel" placeholder="กรอกเบอร์โทรศัพท์ของท่าน" autocomplete="off">
                                 </div>
                             </form>
                         </div>
@@ -33,25 +34,43 @@
                 <div class="col-12 my-2">
                     <div class="card">
                          <div class="card-header">
-                            <h2 class="header-question text-center"><font-awesome-icon icon="clipboard" /> ประเมินความเสี่ยง</h2>
+                            <h4 class="header-question text-center"><font-awesome-icon icon="clipboard" /> ประเมินความเสี่ยง</h4>
                         </div>
-                        <div class="card-body" v-for="(question, index) in dataQuestion" :key="index">
-                            <div class="question-block border my-2">
-                                <h2 class="question my-3 py-4 text-center">{{ index+1 +". " }}{{ question.question + " ?" }}</h2> 
+                        <div class="card-body py-0 mx-4" v-for="(question, questionIndex) in dataQuestion" :key="questionIndex">
+                            <div class="question-block my-4">
+                                <h2 class="question my-3 py-4 text-center">{{ questionIndex+1 +". " }}{{ question.question + " ?" }}</h2> 
                             </div>
-                            <div class="anwser d-flex flex-wrap justify-content-around ">
-                            <question-form 
-                            v-for="(anwser, index) in question.anwsers" 
-                            :key="index"
-                            :anwser="anwser"
-                            :numberAnswer="index"
-                            >
-                            </question-form>
+                            <div class="answer d-flex flex-wrap justify-content-around "> 
+                                <b-form-group   
+                                v-for="(answer, answerIndex) in question.answers" 
+                                :key="answerIndex"
+                                v-slot="{ ariaDescribedby }">
+                                    <b-form-radio-group v-if="questionIndex != 5"
+                                    v-model="answerUser[questionIndex]"
+                                    :aria-describedby="ariaDescribedby"
+                                    buttons
+                                    >
+                                        <b-form-radio class="check-btn"  :value="answer" name="check-button" button>
+                                            {{answer.text}}
+                                        </b-form-radio>
+                                    </b-form-radio-group>
+
+                                    <b-form-checkbox-group v-else
+                                    v-model="answerNo6"
+                                    :aria-describedby="ariaDescribedby"
+                                    buttons
+                                    >
+                                        <b-form-checkbox class="check-btn checkbox-btn"  @change="unCheckedNo6(answerIndex)" :value="answer" :ref="refForm(answerIndex)" name="check-button" button>
+                                            {{answer.text}}
+                                        </b-form-checkbox>
+                                    </b-form-checkbox-group>
+
+                                </b-form-group>
                             </div>
                             <hr>
-                        </div>  
-                        <div class="submit-anwser text-center mb-4">
-                            <button class="btn btn-primary w-75 d-block mx-auto btn-submit-anwser">ส่งคำตอบ</button>
+                        </div> 
+                        <div class="submit-answer text-center mb-4">
+                            <button class="btn btn-primary w-75 d-block mx-auto btn-submit-answer" v-on:click="submit">ส่งคำตอบ</button>
                         </div>
                     </div>
                 </div>
@@ -69,93 +88,108 @@ export default {
     components:{
         summaryPoint,
         questionForm
-    },data: function() {
+    },
+    data: function() {
         return {
+            datasUser:{
+                name: "",
+                tel: "",
+                answer1: "",
+                answer2: "",
+                answer3: "",
+                answer4: "",
+                answer5: "",
+                answer6: "",
+                answer7: "",
+                answer8: "",
+                answer9: "",
+                answer10: "",
+                answer11: "",
+                answer12: "",
+                answer13: "",
+                point: 0,
+            },
+            informationUser:{
+                name:"",
+                tel:""
+            },
+            answerNo6: [],
+            answerNo6Used: {
+                point:0,
+                text:""
+            },
+            answerUser: [],
             submited: false,
             dataQuestion:[
                 {
-                    question:"ท่านนิยามตนเองว่าเป็นกลุ่มประชากรใด (ระยะเวลา 3 เดือนที่ผ่านมา)",
-                    
-                    anwsers:[
+                    question:"ท่านนิยามตนเองว่าเป็นกลุ่มประชากรใด",
+                    answers:[
                         {
-                            number: 1,
-                            anwser:"ชาย",
+                            text:"ชาย",
                             point: 1,
-                            selected: false
                         },
-                        {
-                            number: 1,
-                            anwser:"หญิง",
+                        {                           
+                            text:"หญิง",
                             point: 2,
-                            selected: false
                         },
-                        {
-                            number: 1,
-                            anwser:"ชายที่มีเพศสัมพันธ์กับชาย",
+                        {                           
+                            text:"ชายที่มีเพศสัมพันธ์กับชาย",
                             point: 2,
-                            selected: false
                         },
-                        {
-                            number: 1,
-                            anwser:"สาวประเภทสอง",
+                        {                           
+                            text:"สาวประเภทสอง",
                             point: 2,
-                            selected: false
                         },
-                        {
-                            number: 1,
-                            anwser:"ไบเซ็กชวล",
+                        {                           
+                            text:"ไบเซ็กชวล",
                             point: 2,
-                            selected: false
                         },
-                        {
-                            number: 1,
-                            anwser:"ไม่อยู่ในกรอบเพศชาย/หญิง",
+                        {                           
+                            text:"ไม่อยู่ในกรอบเพศชาย/หญิง",
                             point: 1,
-                            selected: false
                         }
                     ]
                 },
                 {
-                    question:"ท่านเคยได้รับสิ่งของหรือเงิน เพื่อนำไปสู่การมีเพศสัมพันธ์หรือไม่ (ระยะเวลา 3 เดือนที่ผ่านมา)",
-                    anwsers:[
-                        {
-                            number: 2,
-                            anwser:"เคย",
+                    question:"ท่านเคยได้รับสิ่งของหรือเงิน เพื่อนำไปสู่การมีเพศสัมพันธ์ในระยะเวลา 3 เดือนที่ผ่านมาหรือไม่",
+                    answers:[
+                        {                           
+                            text:"เคย",
                             point: 2
                         },
                         {
-                            number: 2,
-                            anwser:"ไม่เคย",
+                           
+                            text:"ไม่เคย",
                             point: 1
                         }
                     ]
                 },
                 {
-                    question:"ผลการตรวจเอชไอวีครั้งล่าสุด (ระยะเวลา 3 เดือนที่ผ่านมา)",
-                    anwsers:[
+                    question:"ผลการตรวจเอชไอวีภายในระยะเวลา 3 เดือนที่ผ่านมาครั้งล่าสุด",
+                    answers:[
                         {
-                            number: 3,
-                            anwser:"ไม่เคยตรวจ",
+                            
+                            text:"ไม่เคยตรวจ",
                             point: 1
                         },
                         {
-                            number: 3,
-                            anwser:"เคยตรวจแต่จำผลการตรวจไม่ได้",
+                            
+                            text:"เคยตรวจแต่จำผลการตรวจไม่ได้",
                             point: 1
                         },
                         {
-                            number: 3,
-                            anwser:"เคยตรวจผลไม่ติดเชื้อเอชไอวี(ลบ)",
+                            
+                            text:"เคยตรวจผลไม่ติดเชื้อเอชไอวี(ลบ)",
                             point: 1
                         },
                         {
-                            number: 3,
-                            anwser:"เคยตรวจผลติดเชื้อเอชไอวี(บวก)",
+                            
+                            text:"เคยตรวจผลติดเชื้อเอชไอวี(บวก)",
                             point: 1
                         },
                         {
-                            number: 3,
-                            anwser:"เคยตรวจแต่สรุปผลไม่ได้",
+                            
+                            text:"เคยตรวจแต่สรุปผลไม่ได้",
                             point: 1
                         }
                     ]
@@ -163,241 +197,426 @@ export default {
                 },
                 {
                     question:"เพศสัมพันธ์กับคู่นอนในระยะ 3 เดือนที่ผ่านมา",
-                    anwsers:[
+                    answers:[
                         {
-                            number: 4,
-                            anwser:"กับคู่นอนประจำ",
+                            text:"กับคู่นอนประจำ",
                             point: 1
                         },
                         {
-                            number: 4,
-                            anwser:"กับคู่นอนไม่ประจำ",
+                            text:"กับคู่นอนไม่ประจำ",
                             point: 2
                         },
                         {
-                            number: 4,
-                            anwser:"กับคู่นอนประจำและคู่นอนไม่ประจำ",
+                            text:"กับคู่นอนประจำและคู่นอนไม่ประจำ",
                             point: 3
                         },
                         {
-                            number: 4,
-                            anwser:"ไม่มีเพศสัมพันธ์",
+                            text:"ไม่มีเพศสัมพันธ์",
                             point: 0
                         }
                     ]
                 },
                 {
                     question:"บทบาททางเพศ",
-                    anwsers:[
+                    answers:[
                         {
-                            number: 5,
-                            anwser:"รุกเท่านั้น",
+                            text:"รุกเท่านั้น",
                             point: 1
                         },
                         {
-                            number: 5,
-                            anwser:"รับเท่านั้น",
+                            text:"รับเท่านั้น",
                             point: 3
                         },
                         {
-                            number: 5,
-                            anwser:"ทั้งรุกทั้งรับ",
+                            text:"ทั้งรุกทั้งรับ",
                             point: 2
                         },
                         {
-                            number: 5,
-                            anwser:"ไม่เคยมีเพศสัมพันธ์",
+                            text:"ไม่เคยมีเพศสัมพันธ์",
                             point: 0
                         }
                     ]
 
                 },
                 {
-                    question:"ท่านมีเพศสัมพันธ์ครั้งล่าสุดทางช่องทางใด (ระยะเวลา 3 เดือนที่ผ่านมา) (สามารถตอบได้มากกว่า 1 ข้อ)",
-                    anwsers:[
+                    question:"ท่านมีเพศสัมพันธ์ครั้งล่าสุดภายในระยะเวลา 3 เดือนที่ผ่านมาทางช่องทางใด (สามารถตอบได้มากกว่า 1 ข้อ)",
+                    answers:[
                         {
-                            number: 6,
-                            anwser:"ทางทวารหนัก",
+                            text:"ทางทวารหนัก",
                             point: 4
                         },
                         {
-                            number: 6,
-                            anwser:"ทางช่องคลอดผู้หญิง",
+                            text:"ทางช่องคลอดผู้หญิง",
                             point: 3
                         },
                         {
-                            number: 6,
-                            anwser:"ทางช่องคลอดสาวประเภทสอง",
+                            text:"ทางช่องคลอดสาวประเภทสอง",
                             point: 3
                         },
                         {
-                            number: 6,
-                            anwser:"ทางปาก",
+                            text:"ทางปาก",
                             point: 2
                         },
                         {
-                            number: 6,
-                            anwser:"ไม่เคยมีเพศสัมพันธ์",
+                            text:"ไม่เคยมีเพศสัมพันธ์",
                             point: 0
                         }
                     ]
                 },
                 {
-                    question:"การใช้ถุงยางอนามัย (ทั้งแบบรุก/แบบรับ) ในระยะ 3 เดือนที่ผ่านมา",
-                    anwsers:[
+                    question:"การใช้ถุงยางอนามัย (ทั้งแบบรุก/แบบรับ) ภายในระยะ 3 เดือนที่ผ่านมา",
+                    answers:[
                         {
-                            number: 7,
-                            anwser:"ใช้ถุงยางทุกครั้ง",
+                            text:"ใช้ถุงยางทุกครั้ง",
                             point: 1
                         },
                         {
-                            number: 7,
-                            anwser:"ใช้ถุงยางเป็นบางครั้ง",
+                            text:"ใช้ถุงยางเป็นบางครั้ง",
                             point: 2
                         },
                         {
-                            number: 7,
-                            anwser:"ไม่เคยใช้ถุงยางเลย",
+                            text:"ไม่เคยใช้ถุงยางเลย",
                             point: 3
                         },
                         {
-                            number: 7,
-                            anwser:"ไม่เคยมีเพศสัมพันธ์",
+                            text:"ไม่เคยมีเพศสัมพันธ์",
                             point: 0
                         }
                     ]
                 },
                 {
                     question:"ในช่วง 3 เดือนที่ผ่านมาท่านมีเพศสัมพันธ์แบบสอดใส่ (ทั้งแบบรุก/แบบรับ) หรือไม่",
-                    anwsers:[
+                    answers:[
                         {
-                            number: 8,
-                            anwser:"มีการสอดใส่",
+                            text:"มีการสอดใส่",
                             point: 2
                         },
                         {
-                            number: 8,
-                            anwser:"ไม่มีการสอดใส่",
+                            text:"ไม่มีการสอดใส่",
                             point: 0
                         },
                         {
-                            number: 8,
-                            anwser:"ไม่แน่ใจ",
+                            text:"ไม่แน่ใจ",
                             point: 1
                         }
                     ]
                 },
                 {
                     question:"ในระยะ 3 เดือนที่ผ่านมา ท่านเคยใช้สารเสพติด Chemsex รวมถึงระหว่างมีเพศสัมพันธ์หรือไม่",
-                    anwsers:[
+                    answers:[
                         {
-                            number: 9,
-                            anwser:"เคยใช้สารเสพติด",
+                            text:"เคยใช้สารเสพติด",
                             point: 2
                         },
                         {
-                            number: 9,
-                            anwser:"ไม่เคยใช้สารเสพติด",
+                            text:"ไม่เคยใช้สารเสพติด",
                             point: 0
                         },
                         {
-                            number: 9,
-                            anwser:"ไม่แน่ใจ",
+                            text:"ไม่แน่ใจ",
                             point: 1
                         }
                     ]
                 },
                 {
-                    question:"ท่านเคยใช้เข็มฉีดยาหรือฉีดสารเสพติด ร่วมกับผู้อื่นหรือไม่ (ระยะเวลา 3 เดือนที่ผ่านมา)",
-                    anwsers:[
+                    question:"ในระยะเวลา 3 เดือนที่ผ่านมา ท่านเคยใช้เข็มฉีดยาหรือฉีดสารเสพติด ร่วมกับผู้อื่นหรือไม่",
+                    answers:[
                         {   
-                            number: 10,
-                            anwser:"เคยใช้เข็มร่วมกับผู้อื่น",
+                            text:"เคยใช้เข็มร่วมกับผู้อื่น",
                             point: 2
                         },
                         {
-                            number: 10,
-                            anwser:"ไม่เคยใช้เข็มร่วมกับผู้อื่น",
+                            text:"ไม่เคยใช้เข็มร่วมกับผู้อื่น",
                             point: 0
                         },
                         {
-                            number: 10,
-                            anwser:"จำไม่ได้",
+                            text:"จำไม่ได้",
                             point: 1
                         }
                     ]
                 },
                 {
                     question:"ในระยะ 3 เดือนที่ผ่านมา ท่านมีอาการผิดปกติ เช่นแผล ตุ่ม หนอง ที่อวัยวะเพศหรือทวารหนัก หรือไม่ ",
-                    anwsers:[
+                    answers:[
                         {
-                            number: 11,
-                            anwser:"เคยมี รักษาหายแล้ว",
+                            text:"เคยมี รักษาหายแล้ว",
                             point: 2
                         },
                         {
-                            number: 11,
-                            anwser:"มีในขณะนี้",
-                            point: 0
+                            text:"มีในขณะนี้",
+                            point: 4
                         },
                         {
-                            number: 11,
-                            anwser:"ไม่เคยมีอาการ",
+                            text:"ไม่เคยมีอาการ",
                             point: 1
                         }
                     ]
                 },
                 {
                     question:"การใช้ PrEP (ยาป้องกันเอชไอวีก่อนสัมผัสเชื้อ) (ระยะเวลา 3 เดือนที่ผ่านมา)",
-                    anwsers:[
+                    answers:[
                         {
-                            number: 12,
-                            anwser:"เคยใช้ PrEP",
+                            text:"เคยใช้ PrEP",
                             point: 0
                         },
                         {
-                            number: 12,
-                            anwser:"ไม่เคยใช้ PrEP",
+                            text:"ไม่เคยใช้ PrEP",
                             point: 0
                         },
                         {
-                            number: 12,
-                            anwser:"ใช้ PrEP อยู่ ",
+                            text:"ใช้ PrEP อยู่ ",
                             point: 0
                         },
                         {
-                            number: 12,
-                            anwser:"ไม่รู้จัก PrEP",
+                            text:"ไม่รู้จัก PrEP",
                             point: 0
                         }
                     ]
                 },
                 {
                     question:"การใช้ PEP (ยาป้องกันเอชไอวีแบบฉุกเฉิน) (ระยะเวลา 3 เดือนที่ผ่านมา)",
-                    anwsers:[
+                    answers:[
                         {
-                            number: 13,
-                            anwser:"เคยใช้ PEP",
+                            text:"เคยใช้ PEP",
                             point: 0
                         },
                         {
-                            number: 13,
-                            anwser:"ไม่เคยใช้ PEP",
+                            text:"ไม่เคยใช้ PEP",
                             point: 0
                         },
                         {
-                            number: 13,
-                            anwser:"ใช้ PEP อยู่ ",
+                            text:"ใช้ PEP อยู่ ",
                             point: 0
                         },
                         {
-                            number: 13,
-                            anwser:"ไม่รู้จัก PEP",
+                            text:"ไม่รู้จัก PEP",
                             point: 0
                         }
                     ]
                 }
             ]
+        }
+    },
+    methods:{
+        refForm: function(index){
+            return "answer"+index;
+        },
+        unCheckedNo6: function(index){
+            let answer0 = this.$refs.answer0[0].value
+            let answer1 = this.$refs.answer1[0].value
+            let answer2 = this.$refs.answer2[0].value
+            let answer3 = this.$refs.answer3[0].value
+            let answer4 = this.$refs.answer4[0].value
+            let checkbox_checked = document.getElementsByClassName("checkbox-btn");
+            if(index == 4){
+                if(checkbox_checked[index].classList.contains('active')){
+                    this.answerNo6 = [];
+                    this.answerNo6.push(answer4)
+                }
+            }else{
+                if(checkbox_checked[4].classList.contains('active')){
+                    this.answerNo6 = [];
+                    switch(index){
+                        case 0:
+                            this.answerNo6.push(answer0)
+                            break;
+                        case 1:
+                            this.answerNo6.push(answer1)
+                            break;
+                        case 2:
+                            this.answerNo6.push(answer2)
+                            break;
+                        case 3:
+                            this.answerNo6.push(answer3)
+                            break;
+                        case 4:
+                            this.answerNo6.push(answer4)
+                            break;                        
+                    }
+                }
+            }
+        },
+        makeAnsertNo6: function(){
+            let textAnswer6 = "";
+            if(this.answerNo6.length > 0){
+                const sumAnswerPoint6 = this.answerNo6.reduce(function(accumulate, answerNo6){
+                return accumulate + Number(answerNo6.point);
+            },0);
+            console.log(sumAnswerPoint6);
+            this.answerNo6.forEach(function(value,i){
+                  textAnswer6 += value.text+" ";
+                })
+                this.answerNo6Used.point = Number(sumAnswerPoint6);
+                this.answerNo6Used.text = textAnswer6;
+            }
+        },
+        mapData: function(){
+            let text_answer = "";
+            let tempDatasUser = this.datasUser;
+            this.answerUser.forEach(function(value,i){    
+                text_answer = value.text;
+                switch(i){
+                    case 0 :
+                        tempDatasUser.answer1 = text_answer;
+                        break;
+                    case 1 :
+                        tempDatasUser.answer2 = text_answer;
+                        break;
+                    case 2 :
+                        tempDatasUser.answer3 = text_answer;
+                        break;
+                    case 3 :
+                        tempDatasUser.answer4 = text_answer;
+                        break;
+                    case 4 :
+                        tempDatasUser.answer5 = text_answer;
+                        break;
+                    case 5 :
+                        tempDatasUser.answer6 = text_answer;
+                        break;
+                    case 6 :
+                        tempDatasUser.answer7 = text_answer;
+                        break;
+                    case 7 :
+                        tempDatasUser.answer8 = text_answer;
+                        break;
+                    case 8 :
+                        tempDatasUser.answer9 = text_answer;
+                        break;
+                    case 9 :
+                        tempDatasUser.answer10 = text_answer;
+                        break;
+                    case 10 :
+                        tempDatasUser.answer11 = text_answer;
+                        break;
+                    case 11 :
+                        tempDatasUser.answer12 = text_answer;
+                        break;
+                    case 12 :
+                        tempDatasUser.answer13 = text_answer;
+                        break;
+                } 
+            })
+            this.datasUser = tempDatasUser;
+            this.datasUser.name = this.informationUser.name;
+            this.datasUser.tel = this.informationUser.tel;
+            this.datasUser.point = this.summary();
+            console.log(this.datasUser);
+        },
+        submit: function(){
+            let passed_information = false;
+            let passed_answer = false;
+
+            // check informationUser
+            if(this.informationUser.name == "" && this.informationUser.tel == ""){
+                this.$swal({
+                    icon:'warning',
+                    title:'แจ้งเตือน',
+                    text:'กรุณากรอกชื่อและเบอร์โทรศัพท์ของท่าน !',
+                })
+            }else{
+                if(this.informationUser.name == ""){
+                    this.$swal({
+                        icon:'warning',
+                        title:'แจ้งเตือน',
+                        text:'กรุณากรอกชื่อของท่าน !',
+                    })
+                }
+                if(this.informationUser.tel == ""){
+                    this.$swal({
+                        icon:'warning',
+                        title:'แจ้งเตือน',
+                        text:'กรุณากรอกเบอร์โทรศัพท์ของท่าน !',
+                    })
+                }else{
+                    if(this.informationUser.tel.length != 10){
+                        this.$swal({
+                            icon:'warning',
+                            title:'แจ้งเตือน',
+                            text:'กรุณากรอกเบอร์โทรศัพท์ของท่านให้ถูกต้อง !',
+                        })
+                    }else{
+                         passed_information = true;
+                    }
+                }   
+            }
+            // check answerUser
+            if(this.answerUser.length != 0){
+                const answerIncludesNull = this.answerUser.some(function(answerUser){
+                    return answerUser == null;
+                });
+                if(answerIncludesNull){
+                    this.$swal({
+                    icon:'warning',
+                    title:'แจ้งเตือน',
+                    text:'กรุณากรอกตอบคำถามให้ครบถ้วน !',
+                    })
+                }else{
+                    if(this.answerUser.length == 13){
+                        passed_answer = true;
+                    }else{
+                        this.$swal({
+                            icon:'warning',
+                            title:'แจ้งเตือน',
+                            text:'กรุณากรอกตอบคำถามให้ครบถ้วน !',
+                        })
+                    }
+                }
+            }else{
+                this.$swal({
+                    icon:'warning',
+                    title:'แจ้งเตือน',
+                    text:'กรุณากรอกตอบคำถามให้ครบถ้วน !',
+                })
+            }
+
+            if(passed_information && passed_answer){
+                this.$swal({
+
+                    icon:'warning',
+                    title:'แจ้งเตือน',
+                    text:'ท่านต้องการส่งคำตอบใช่หรือไม่ ?',
+                })
+                .then((result) => {
+                    if(result.isConfirmed){
+                        this.mapData();
+                        axios.post('/api/submit',{
+                            datasUser: this.datasUser
+                        })
+                        .then( response => {
+                            if( response.status == 201 ) {
+                                this.$swal({
+                                    icon:'success',
+                                    title:'แจ้งเตือน',
+                                    text:'การส่งคำตอบสำเร็จ !',
+                                })
+                                .then((result) => {
+                                    if(result.isConfirmed){
+                                        this.submited = true;
+                                    }
+                                })
+                               
+                                }
+                            })
+                            .catch( error => {
+                                console.log(error)
+                            })
+                    }
+                   
+                })
+                const sum_point = this.summary();
+                console.log(this.answerNo6)
+                console.log(this.answerUser )
+                console.log(sum_point);
+            }
+        },
+        summary: function(){
+            this.makeAnsertNo6();
+            this.answerUser[5] = this.answerNo6Used;
+            const sum = this.answerUser.reduce(function(accumulate, answerUser){
+                return accumulate + Number(answerUser.point);
+            },0);
+            return sum;
         }
     }
 }
@@ -408,20 +627,45 @@ export default {
     background-color: #328679;
     color: white;
 }
-.number-question{
-    border:2px solid black;
-    font-size: 1.5em;
-    width: 45px;
-    height: 45px;
-}
-.question-block {
+.container-fluid{
     background-color: #D1E6E4;
 }
+.question-block {
+    padding: 0 10px;
+    border-radius: 10px;
+    background-color: #FFE4A1;
+}
+.card-header{
+    background-color: #FFE4A1;
+}
+.card-header{
+    background-color: #FFF6CC;
+}
 form, .question{
-    
-    font-size: 1.5em;
+    font-size: 1.25em;
 }   
-.btn-submit-anwser{
+.check-btn{
+    color: black;
+    background-color: #FAFFFD;
+    border:3px solid #328679;
+    min-width: 275px;
+}
+.check-btn:hover{
+    color: black !important;
+    background-color: #ACC7A5 !important;
+    border:3px solid #328679 !important;
+    transform: scale(1.00125) !important;
+    transition: 0.5s ease-in !important;
+
+}
+.check-btn.active{
+    font-weight: bold;
+    color: #000 !important;
+    background-color: #ACC7A5 !important;
+    transform: scale(1.025) !important;
+    transition: 0.5s ease-in !important;
+}
+.btn-submit-answer{
     font-size: 1.25em;
 }
 

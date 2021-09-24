@@ -1,10 +1,25 @@
 <template>
-    <div class="chiose col-12 col-sm-5 col-m-5 col-l-5 col-xl-5 m-2 rounded shadow" 
+    <div>
+        <b-form-group v-slot="{ ariaDescribedby }">
+            <b-form-radio-group
+            id="btn-radios-1"
+            v-model="answer1"
+            :aria-describedby="ariaDescribedby"
+            >
+                <b-form-radio :value="{anwser}" name="check-button" button>
+                    {{anwser.anwser}}
+                </b-form-radio>
+            </b-form-radio-group>
+        </b-form-group>
+    </div>
+    
+    <!-- <div class="chiose col-12 col-sm-5 col-m-5 col-l-5 col-xl-5 m-2 rounded shadow" 
         v-on:click="selectOption(numberAnswer)"
         :class="['number-question-'+anwser.number+'-choise-'+numberAnswer]"
          >
         <p class="text-center p-2 my-auto">{{anwser.anwser}}</p>
-    </div>
+    </div> -->
+    
 </template>
 
 <script>

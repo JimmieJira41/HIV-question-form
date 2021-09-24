@@ -19,13 +19,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Pridi&display=swap" rel="stylesheet">
         <link href="{{asset('/css/app.css')}}" rel="stylesheet">
         <style>
-            body{
-                /* font-family: 'Kanit', sans-serif; */
-                /* font-family: 'Noto Sans Thai Looped', sans-serif; */
+            body,html{
                 font-family: 'Pridi', serif;
                 background-color: #D1E6E4;
+                height: 100vh !important;
             }
-            /* font-family: 'Kanit', sans-serif; */
 
         </style>
 

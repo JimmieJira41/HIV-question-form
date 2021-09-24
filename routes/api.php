@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AnwserUserController;
+use App\Http\Controllers\AnswerUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 /*
@@ -18,4 +18,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/submit', [AnwserUserController::class, 'store']);
+Route::post('/submit', [AnswerUserController::class, 'store']);
