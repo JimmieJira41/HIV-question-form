@@ -1,10 +1,10 @@
-
 require('./bootstrap');
-
 
 import Vue from 'vue'
 import App from './components/app'
-
+import questionnaire from './components/questionnaire'
+import informationUser from './components/informationUser'
+import VueRouter from 'vue-router';
 //BootstrapVue
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -16,18 +16,38 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 // Font Awesome Icon
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faAddressCard, faClipboard } from '@fortawesome/free-solid-svg-icons'
+import { faAddressCard, faClipboard, faHeart, faExternalLinkAlt} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faAddressCard, faClipboard)
 
+library.add(faAddressCard, faClipboard, faHeart, faExternalLinkAlt)
+
+Vue.use(VueRouter)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(VueSweetalert2);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
-const app = new Vue({
+const router = new VueRouter({
+        mode: 'history',
+        routes: [
+            {
+                path: '/',
+                name: 'questionnaire',
+                component: questionnaire
+            },
+            {
+                path: '/information-user',
+                name: 'information-user',
+                component: informationUser
+            },
+        ],
+    });
+
+  const app = new Vue({
     el: '#app',
-    components: { App }
+    components: { App },
+    router,
 });
+

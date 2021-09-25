@@ -16,7 +16,8 @@ class AnswerUserController extends Controller
      */
     public function index()
     {
-        //
+        return AnswerUser::orderBy('submit_at', 'DESC')->get();
+        
     }
 
     /**
@@ -109,7 +110,7 @@ class AnswerUserController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
