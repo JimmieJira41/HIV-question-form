@@ -110,7 +110,7 @@ class AnswerUserController extends Controller
      */
     public function show($id)
     {
-
+        return AnswerUser::find($id);
     }
 
     /**

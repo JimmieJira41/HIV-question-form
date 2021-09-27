@@ -19,5 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/submit', [AnswerUserController::class, 'store']);
+Route::get('/get-information-user/{id}', [AnswerUserController::class, 'show']);
 Route::get('/information', [AnswerUserController::class, 'index']);
 

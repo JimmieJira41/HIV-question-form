@@ -3,6 +3,7 @@ require('./bootstrap');
 import Vue from 'vue'
 import App from './components/app'
 import questionnaire from './components/questionnaire'
+import summary from './components/summaryPoint'
 import informationUser from './components/informationUser'
 import VueRouter from 'vue-router';
 //BootstrapVue
@@ -40,6 +41,11 @@ const router = new VueRouter({
                 path: '/',
                 name: 'questionnaire',
                 component: questionnaire
+            },
+            {
+                path: '/summary/:id',
+                name: 'summary',
+                component: summary
             },
             {
                 path: '/information-user',

@@ -25,7 +25,7 @@ export default {
   },
   data: function () {
     return {
-      img: "/img/Mplus-Logo.jpg",
+      img: "/img/Mplus-Logo.png",
     };
   },
 };

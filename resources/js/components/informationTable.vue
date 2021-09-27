@@ -26,6 +26,7 @@ export default {
       return {
         data: this.informationUser,
         actionMode: "multiple",
+        showDownloadButton: false,
         columns: [
           {
             key: "name",

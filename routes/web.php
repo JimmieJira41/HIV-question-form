@@ -17,6 +17,10 @@ Route::get('/', function () {
     return view('questionnaire');
 });
 
+Route::get('/summary/{id}', function ($id) {
+    return view('summary');
+});
+
 Route::get('/information-user', function () {
     return view('information-user');
 });
