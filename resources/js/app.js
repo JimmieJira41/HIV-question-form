@@ -17,7 +17,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 // Font Awesome Icon
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faAddressCard, faClipboard, faHeart, faExternalLinkAlt, faTable} from '@fortawesome/free-solid-svg-icons'
+import { faAddressCard, faClipboard, faHeart, faExternalLinkAlt, faTable, faSyringe} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // DataTable
@@ -25,7 +25,7 @@ import DataTable from "@andresouzaabreu/vue-data-table";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@andresouzaabreu/vue-data-table/dist/DataTable.css";
 
-library.add(faAddressCard, faClipboard, faHeart, faExternalLinkAlt, faTable)
+library.add(faAddressCard, faClipboard, faHeart, faExternalLinkAlt, faTable, faSyringe)
 
 Vue.use(VueRouter)
 Vue.use(BootstrapVue);

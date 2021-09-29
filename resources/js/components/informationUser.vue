@@ -7,7 +7,9 @@
             ตารางข้อมูลผู้ใช้งานจากแบบประเมินความเสี่ยงด้วยตัวเอง
             <br />(ระยะเวลา 3 เดือนที่ผ่านมา)
           </h4>
-          <img class="col-6 col-sm-6 col-md-3 col-lg-2 col-xl-2" :src="img" />
+        </div>
+        <div class="img-logo">
+          <img class="col-8 col-sm-6 col-md-4 col-lg-4 col-xl-3" :src="img" />
         </div>
       </div>
     </div>
@@ -25,7 +27,7 @@ export default {
   },
   data: function () {
     return {
-      img: "/img/Mplus-Logo.png",
+      img: "/img/logo_caremat.png",
     };
   },
 };

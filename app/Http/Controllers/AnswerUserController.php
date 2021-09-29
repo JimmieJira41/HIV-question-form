@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AnswerUser;
+use App\Models\LineToken;
 use Illuminate\Support\Carbon;
-use Phattarachai\LineNotify\Facade\Line;
+
 
 class AnswerUserController extends Controller
 {
@@ -38,6 +39,8 @@ class AnswerUserController extends Controller
      */
     public function store(Request $request)
     {   
+        $LineTokenS = LineToken::all();
+        $LineToken = $LineTokenS->find(1);
         $DataUser = new AnswerUser();
 
         $DataUser->name = $request->datasUser['name'];
@@ -64,7 +67,7 @@ class AnswerUserController extends Controller
             error_reporting(E_ALL);
             date_default_timezone_set("Asia/Bangkok");
 
-            $sToken = "QOeFO6829utICVIxUF699bYSMAZLthL1fuOA7XfJcXh";
+            $sToken = $LineToken->token;
             $sMessage = 
             "\nมีรายการส่งคำตอบแบบสอบถาม\n"
             ."ผู้ใช้งาน: ".$DataUser->name."\n"

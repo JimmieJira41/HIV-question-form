@@ -1,30 +1,36 @@
 <template>
   <div class="container-fluid px-0">
-    <template>
-      <div class="title-question-form col-12 card mb-4">
-        <div class="card-body container">
-          <div class="header-logo text-center mt-0 mb-2">
-            <h4 class="header-question text-center">
-              แบบประเมินความเสี่ยงด้วยตัวเอง <br />(ระยะเวลา 3 เดือนที่ผ่านมา)
-            </h4>
-            <img class="col-6 col-sm-6 col-md-3 col-lg-2 col-xl-2" :src="img" />
-          </div>
+    <div class="title-question-form col-12 card mb-2">
+      <div class="card-body container">
+        <div class="header-logo text-center mt-0 mb-2">
+          <h4 class="header-question text-center">
+            <font-awesome-icon icon="syringe" /> แบบประเมินความเสี่ยงด้วยตัวเอง
+            (ระยะเวลา 3 เดือนที่ผ่านมา) <font-awesome-icon icon="syringe" />
+          </h4>
         </div>
       </div>
-      <div class="container">
+    </div>
+    <div class="container">
+      <form onSubmit="return false">
         <div class="row">
+          <div class="img-logo col-12 text-center m-0">
+            <img
+              class="col-8 col-sm-6 col-md-4 col-lg-4 col-xl-3 m-2"
+              :src="img"
+            />
+          </div>
           <div class="col-12">
-            <div class="card my-4">
+            <div class="card my-2">
               <div class="card-header">
                 <h4 class="header-question text-center">
                   <font-awesome-icon icon="address-card" /> ข้อมูลทั่วไป
                 </h4>
               </div>
               <div class="card-body">
-                <form
+                <div
                   id="form"
                   class="d-flex justify-content-center flex-wrap"
-                  onsubmit="return false"
+                  onSubmit="return false"
                 >
                   <div
                     class="
@@ -53,7 +59,7 @@
                   >
                     <label for="tel">เบอร์โทรศัพท์</label>
                     <input
-                      type="tel"
+                      type="number"
                       class="form-control border-none shadow"
                       id="tel"
                       v-model="informationUser.tel"
@@ -62,7 +68,7 @@
                       required
                     />
                   </div>
-                </form>
+                </div>
               </div>
             </div>
           </div>
@@ -79,9 +85,9 @@
                 :key="questionIndex"
               >
                 <div class="question-block my-4">
-                  <h2 class="question my-3 py-4 text-center">
+                  <h4 class="question my-3 py-4 text-center">
                     {{ questionIndex + 1 + ". " }}{{ question.question + " ?" }}
-                  </h2>
+                  </h4>
                 </div>
                 <div
                   class="answer d-flex flex-column flex-wrap align-items-center"
@@ -134,14 +140,14 @@
                   class="btn btn-primary w-75 d-block mx-auto btn-submit-answer"
                   v-on:click="submit"
                 >
-                  ส่งคำตอบ
+                ส่งคำตอบ
                 </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </template>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -154,7 +160,7 @@ export default {
   },
   data: function () {
     return {
-      img: "/img/Mplus-Logo.png",
+      img: "/img/logo_caremat.png",
       datasUser: {
         name: "",
         tel: "",
@@ -232,11 +238,11 @@ export default {
           question: "ผลการตรวจเอชไอวีภายในระยะเวลา 3 เดือนที่ผ่านมาครั้งล่าสุด",
           answers: [
             {
-              text: "A: เคยตรวจ สรุปผล ไม่ติดเชื้อเอชไอวี (ลบ)",
+              text: "A: เคยตรวจ ผลเลือดเป็นลบ (ไม่ติดเชื้อเอชไอวี)",
               point: 1,
             },
             {
-              text: "B: เคยตรวจ สรุปผล ติดเชื้อเอชไอวี (บวก)",
+              text: "B: เคยตรวจ ผลเลือดเป็นบวก (ติดเชื้อเอชไอวี)",
               point: 1,
             },
             {
@@ -582,9 +588,8 @@ export default {
           icon: "warning",
           title: "แจ้งเตือน",
           text: "กรุณากรอกชื่อและเบอร์โทรศัพท์ของท่าน !",
-        })
-        .then((result) =>{
-            location.href = "#form"
+        }).then((result) => {
+          location.href = "#form";
         });
       } else {
         if (this.informationUser.name == "") {
@@ -614,17 +619,19 @@ export default {
       }
       // check answerUser
       if (this.answerUser.length != 0) {
-        const answerIncludesNull = this.answerUser.some(function (answerUser) {
-          return answerUser == null;
+        let answerIncludes = this.answerUser.filter((value) => {
+          return value != null;
         });
-        if (answerIncludesNull) {
+        if (answerIncludes.length < 12) {
           this.$swal({
             icon: "warning",
             title: "แจ้งเตือน",
             text: "กรุณากรอกตอบคำถามให้ครบถ้วน !",
           });
         } else {
-          if (this.answerUser.length == 13) {
+          if (answerIncludes.length == 12 || answerIncludes.length == 13) {
+            this.makeAnsertNo6();
+            this.answerUser[5] = this.answerNo6Used;
             passed_answer = true;
           } else {
             this.$swal({
@@ -643,6 +650,7 @@ export default {
       }
 
       if (passed_information && passed_answer) {
+        console.log(this.answerUser);
         this.$swal({
           icon: "warning",
           title: "แจ้งเตือน",
@@ -660,10 +668,13 @@ export default {
                 datasUser: this.datasUser,
               })
               .then((response) => {
-                  let responseData = response.data.replace("status : 200message : ok","")
-                  responseData = String(responseData);
-                  console.log(responseData)
-                  responseData = JSON.parse(responseData)
+                let responseData = response.data.replace(
+                  "status : 200message : ok",
+                  ""
+                );
+                responseData = String(responseData);
+                console.log(responseData);
+                responseData = JSON.parse(responseData);
                 if (response.status == 201) {
                   this.$swal({
                     icon: "success",
@@ -672,8 +683,9 @@ export default {
                     confirmButtonColor: "#3085d6",
                     confirmButtonText: "ยืนยัน",
                   }).then((result) => {
+                    console.log(responseData.id)
                     if (result.isConfirmed) {
-                      location.href="/summary/"+responseData.id
+                      location.href = "/summary/" + responseData.id;
                     }
                   });
                 }
@@ -683,15 +695,9 @@ export default {
               });
           }
         });
-        const sum_point = this.summary();
-        console.log(this.answerNo6);
-        console.log(this.answerUser);
-        console.log(sum_point);
       }
     },
     summary: function () {
-      this.makeAnsertNo6();
-      this.answerUser[5] = this.answerNo6Used;
       const sum = this.answerUser.reduce(function (accumulate, answerUser) {
         return accumulate + Number(answerUser.point);
       }, 0);
@@ -718,9 +724,12 @@ export default {
   color: #fff;
   background-color: #805e9d;
 }
-form,
-.question {
+form
+{
   font-size: 1.25em;
+}
+.question {
+  font-size: 1em;
 }
 .check-btn {
   color: black;
@@ -743,57 +752,29 @@ form,
   transition: 0.1s ease-in !important;
 }
 .btn-submit-answer {
-  font-size: 1.25em;
+  font-size: 1em;
 }
 @media only screen and (min-width: 768px) {
   .check-btn {
     width: 300px;
-  }
-  .header-logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .header-logo img {
-    order: 0;
-  }
-  .header-logo h4 {
-    order: 1;
-    text-align: left !important;
   }
 }
 @media only screen and (min-width: 1024px) {
   .check-btn {
     width: 325px;
   }
-  .header-logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .header-logo img {
-    order: 0;
-  }
-  .header-logo h4 {
-    order: 1;
-    text-align: left !important;
-  }
 }
 @media only screen and (min-width: 1440px) {
   .check-btn {
     width: 350px;
   }
-  .header-logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .header-logo img {
-    order: 0;
-  }
-  .header-logo h4 {
-    order: 1;
-    text-align: left !important;
-  }
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 </style>
